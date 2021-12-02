@@ -4,20 +4,20 @@ const fs = require( 'fs' );
 const processLine = function( state, line ) {
     let [direction, quantity] = line.split(' ');
     quantity = parseInt(quantity, 10);
-    let adjustments = [ 0, 0, 0 ];
     if( direction === 'down' )
     {
-        state.depth += quantity;
+        state.aim += quantity;
     }
     else if( direction === 'up' )
     {
-        state.depth -= quantity;
-        if( state.depth < 0 ) state.depth = 0;
+        state.aim -= quantity;        
     }
     else if( direction === 'forward' )
     {
         state.distance += quantity;
+        state.depth += state.aim * quantity;
     }
+    if( state.depth < 0 ) state.depth = 0;
 }
 
 let state =  {
