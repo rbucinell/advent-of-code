@@ -1,36 +1,35 @@
 const fs = require( 'fs' );
 
 
-const processLine = function( line ) {
+const processLine = function( state, line ) {
     let [direction, quantity] = line.split(' ');
     quantity = parseInt(quantity, 10);
-    let adjustments = [ 0, 0 ];
+    let adjustments = [ 0, 0, 0 ];
     if( direction === 'down' )
     {
-        adjustments[0] += quantity;
+        state.depth += quantity;
     }
     else if( direction === 'up' )
     {
-        adjustments[0] -= quantity;        
+        state.depth -= quantity;
+        if( state.depth < 0 ) state.depth = 0;
     }
     else if( direction === 'forward' )
     {
-        adjustments[1] += quantity;
+        state.distance += quantity;
     }
-    return adjustments;
 }
 
-let depth = 0;
-let distance = 0;
+let state =  {
+    depth: 0,
+    distance: 0,
+    aim: 0
+};
 
 const input = fs.readFileSync('input', 'utf8').split('\n').map( e => e.trim() );
 
 console.log( input );
-input.forEach( line => {
-    let adj = processLine( line );
-    depth += adj[0];
-    if( depth < 0 ) depth = 0;
-    distance += adj[1];
-} );
+input.forEach( line => processLine( state, line ));
 
-console.log( `depth=${depth} distance=${distance} mult=${ depth * distance}`);
+console.log( `depth=${state.depth} distance=${state. distance} aim=${ state.aim }`);
+console.log( `mult = ${ state.depth * state.distance}`)
