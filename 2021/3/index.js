@@ -1,16 +1,20 @@
 const fs = require( 'fs' );
-const powerConsumption = ( gamma, epsilon ) => parseInt(gamma,2) * parseInt(epsilon,2);
-const lifeSupportRating = ( oxygenGen, co2scrub ) => oxygenGen * co2scrub;
+const multiBinStr = ( a, b ) => parseInt(a,2) * parseInt(b,2);
 
-const mostCommonAtBitPosition = ( input, col ) => {
+const mostCommonAtBitPosition = ( input, col, tie = '1' ) => {
     let count1 = 0, count0 = 0;
     input.forEach(element => element[col] === '1' ? count1++ : count0++);
-    return ( count1 > count0 ) ? '1' : '0';
+    return count1 === count0 ? tie : (count1>count0) ? '1':'0';
+}
+
+const leastCommonAtBitPosition = ( input, col, tie = '0' ) => {
+    let count1 = 0, count0 = 0;
+    input.forEach(element => element[col] === '1' ? count1++ : count0++);
+    return count1 === count0 ? tie : (count1<count0) ? '1':'0';
 }
 
 const calculateGamma = function( input ) {
     let gammaStr = "";
-    console.log( input)
     for( let col = 0; col < input[0].length; col++) {
         gammaStr += mostCommonAtBitPosition(input, col);
     }    
@@ -22,12 +26,34 @@ const calculateEpsilon = function( input ) {
     return gamma.split('').map( e => e === '1'? '0': '1').join('');
 }
 
-const input = fs.readFileSync('sample', 'utf8').split('\n').map( e => e.trim().split('') );
-let gamma = calculateGamma( input );
-let epsilon = calculateEpsilon( input );
+const oxygenGeneratorRating = function( i )
+{
+    let input = [...i]; // copy
+    for( let col = 0; col < input[0].length; col++  )
+    {
+        let m = mostCommonAtBitPosition(input, col);
+        input = input.filter( predicate => predicate[col] === m );
+    }
+    return input[0].join('');
+}
 
-let oxygen = 0, co2 = 0;
+const co2ScrubberRating = function( i )
+{
+    let input = [...i]; // copy
+    for( let col = 0; col < input[0].length; col++  )
+    {
+        let m = leastCommonAtBitPosition(input, col);
+        input = input.filter( predicate => predicate[col] === m );
+        if( input.length === 1 ) break;
+    }
+    return input[0].join('');
+}
 
-console.log(parseInt(gamma,2) ,parseInt(epsilon,2) )
-console.log( `γ= ${gamma} ε= ${epsilon} power= ${powerConsumption(gamma,epsilon)}`);
-console.log( `Life Support Rating = ${lifeSupportRating(oxygen,co2)}`)
+const input = fs.readFileSync('input', 'utf8').split('\n').map( e => e.trim().split('') );
+let gamma    = calculateGamma( input );
+let epsilon  = calculateEpsilon( input );
+let oxygen   = oxygenGeneratorRating( input );
+let co2      = co2ScrubberRating(input);
+
+console.log( `γ= ${gamma} ε= ${epsilon} power= ${multiBinStr(gamma,epsilon)}`);
+console.log( `O=${oxygen} CO2=${co2} Life Support Rating = ${multiBinStr(oxygen,co2)}`);
