@@ -29,3 +29,22 @@ for( let i = 0; i < drawings.length; i++ )
         break;
     }
 }
+
+let d = 0;
+while( boards.length != 1 )
+{
+    let num = drawings[d];
+    boards.forEach( b => b.add( num ) );
+    boards = boards.filter( b => !b.hasWon() );
+    d++;
+}
+--d;
+let last = boards[0];
+let num = drawings[d];
+while( !last.hasWon() ){
+    num = drawings[d];
+    last.add( drawings[d++] );
+}
+console.log( last.toString() );
+console.log( `last pick ${num}`);
+console.log( `Last place board ${ last.calcuate() * num}`);
