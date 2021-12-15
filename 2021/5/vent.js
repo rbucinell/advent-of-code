@@ -24,13 +24,29 @@ class HydrothermalVent {
         let minY = Math.min( this.y1, this.y2 );
         let maxY = Math.max( this.y1, this.y2 );
 
-        for( let i = minX; i <= maxX; i++)
+        if( maxY-minY === 0 || maxX - minX === 0 )
         {
-            for( let j = minY; j <=  maxY; j++)
+            for( let i = minX; i <= maxX; i++)
             {
-                arr.push( new Point(i,j) );
+                for( let j = minY; j <=  maxY; j++)
+                {
+                    arr.push( new Point(i,j) );
+                }
             }
         }
+        else
+        {
+            let m = (maxY-minY)/(maxX-minX); // m = y2-y1/ x2-x1
+            let b = minY - m * minX //y = mx + b  => b=y-mx
+            for( let i = minX; i < maxX; i++ )
+            {
+                let yi = m * i + b;
+                arr.push( new Point(i,yi));
+            }
+        }
+
+
+        //horizontal
         return arr;
     }
 
