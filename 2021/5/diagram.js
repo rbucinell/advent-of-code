@@ -54,4 +54,17 @@ module.exports = class Diagram {
         }
         return count;
     }
+
+    solvePart2(){
+        //the number of points where at least two lines overlap
+        let count = 0;
+        for( let r = 0; r < this.grid.length; r++ )
+        {
+            for( let c = 0; c < this.grid[0].length; c++ )
+            {
+                count += this.grid[r][c] >= 2 ? 1 : 0;
+            }
+        }
+        return count;
+    }
 }
