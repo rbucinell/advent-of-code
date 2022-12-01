@@ -2,23 +2,37 @@ const fs = require( 'fs' );
 const input = fs.readFileSync('./2022/1/1.input', 'utf8').split('\n').map((num) => parseInt(num, 10));
 
 let elves = [];
-let elf = [];
-
-console.log (input);
-
+let rations = [];
 let max = 0;
+class Elf {
+    constructor( rations = [] ){
+        this.rations = rations;
+        this.calories = this.countCalories();
+    }
 
+    countCalories()
+    {
+        return this.rations.reduce( (p,c)=> p+c, 0);
+    }
+}
+
+//dumb approach, should be max heap, will re-write if requires later
 for( let i = 0; i < input.length; i++)
 {
     let ration = input[i];
     if( isNaN(ration) )
     {
-        elves.push( [...elf] );
-        let sum = elf.reduce((p,c) => p+c, 0);
+        let elf = new Elf(rations);
+        elves.push( elf );
+        let sum = elf.calories;
         if( sum > max) max = sum;
-        elf = [];
+        rations = [];
     }
     else
-        elf.push( ration );
+        rations.push( ration );
 }
+//Part 1 output
 console.log( max ); //65912
+
+elves.sort( (a,b) => b.calories - a.calories ); //largets to smallest
+console.log( elves[0].calories + elves[1].calories + elves[2].calories ); //195625
