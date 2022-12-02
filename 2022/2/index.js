@@ -1,74 +1,57 @@
 import fs from 'fs'
 const input = fs.readFileSync('./2022/2/input.txt', 'utf8').split('\r\n').map(row => row.split(' '));
-console.log( input );
 
-
-function calcScore( oppenentShape, yourShape )
+function calcScore( opponent, you )
 {
-    let shape = 0;
-    if( yourShape === 'A' ) shape = 1;
-    else if( yourShape === 'B' ) shape = 2;
-    else if( yourShape === 'C' ) shape = 3;
+    let shape = 1;
+    if( you === 'B' ) shape = 2;
+    else if( you === 'C' ) shape = 3;
     
     let outcome = 6;
-    if( (oppenentShape === 'A' && yourShape === 'A') || 
-        (oppenentShape === 'B' && yourShape === 'B') ||
-        (oppenentShape === 'C' && yourShape === 'C'))
-        outcome = 3;
-    else if( (oppenentShape === 'A' && yourShape === 'C') || 
-             (oppenentShape === 'B' && yourShape === 'A') ||
-             (oppenentShape === 'C' && yourShape === 'B'))
+    if (opponent === you ) outcome = 3;
+    else if( (opponent === 'A' && you === 'C') || 
+             (opponent === 'B' && you === 'A') ||
+             (opponent === 'C' && you === 'B'))
         outcome = 0;
-    //console.log( `[${oppenentShape}, ${yourShape}]: ${shape} + ${outcome} = ${shape+outcome}`)
+        
     return shape + outcome;
-    //0 lose, 3 draw, 6 win
 }
 
-function calcRound( oppenentShape, yourShape )
+function calcRound( opponent, you )
 {
+    //AX rock, BY paper, CZ scissors
     let shape = 'A';
-    if( yourShape === 'Y' ) shape = 'B';
-    if( yourShape === 'Z' ) shape = 'C';
-    return calcScore( oppenentShape, shape );
-    //AX rock
-    //BY paper
-    //CZ scissors
+    if( you === 'Y' ) shape = 'B';
+    if( you === 'Z' ) shape = 'C';
+    return calcScore( opponent, shape );
 }
 
-function calcRoundPart2( oppenentShape, desiredOutcome )
+function calcRoundPart2( opponent, desiredOutcome )
 {
     let win = 'Z', lose = 'X', draw = 'Y';
-    let yourShape = 'A';
+    let you = 'A';
 
     if( desiredOutcome === win )
     {
-        if( oppenentShape === 'A') yourShape = 'B';
-        else if( oppenentShape === 'B') yourShape = 'C';
+        if( opponent === 'A') 
+            you = 'B';
+        else if( opponent === 'B') 
+            you = 'C';
     }
     else if( desiredOutcome === lose){
-        if( oppenentShape === 'C' ) yourShape = 'B';
-        else if( oppenentShape === 'A') yourShape = 'C';
+        if( opponent === 'C' ) 
+            you = 'B';
+        else if( opponent === 'A') 
+            you = 'C';
     }
     else
-        yourShape = oppenentShape;
-    
-    return calcScore(oppenentShape, yourShape);
+        you = opponent;
 
-
-
-
-    
-
-
+    return calcScore(opponent, you);
 }
 
+let score  = input.reduce( (sum, round) => sum + calcRound(...round), 0);
+let score2 = input.reduce( (sum, round) => sum + calcRoundPart2(...round), 0);
 
-let score = 0;
-let p2score = 0;
-for( let i = 0; i < input.length; i++ )
-{
-    score += calcRound( input[i][0], input[i][1] ); 
-    p2score += calcRoundPart2( input[i][0], input[i][1] );
-}
-console.log( 'score', score ); //part 1 = 10994
-console.log( 'p2score', p2score ); //part 2 = 12526
+console.log( 'Part 1 = ', score );  //part 1 = 10994
+console.log( 'Part 2 = ', score2 ); //part 2 = 12526
