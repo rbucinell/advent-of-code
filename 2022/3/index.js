@@ -13,6 +13,25 @@ let total = input.reduce( (sum,row) => {
     let [key] = match;
     return sum + priorities.indexOf(key)+1;
 }, 0);
-console.log( total)
+console.log( total) //part1 8153
+
+let total2 = 0;
+for( let i = 0; i < input.length; i+=3)
+{
+    let r1 = input[i];
+    let r2 = input[i+1];
+    let r3 = input[i+2];
+
+    let match = new Set();
+    r1.split('').forEach( letter => {
+        if( r2.indexOf( letter ) !== -1 && r3.indexOf(letter) !== -1 ) match.add( letter );
+    });
+
+    let [key] = match;
+    total2 += priorities.indexOf(key)+1;
+
+
+}
+console.log(total2);
 
 
