@@ -16,8 +16,17 @@ function compareRanges( range1, range2 )
 
     let [smaller, larger] = range1Length <= range2Length ? [range1,range2] : [range2,range1];
 
-    if( larger[0] <= smaller[0] && larger[1]>= smaller[1]) return 1;
-    return 0;
+    return ( larger[0] <= smaller[0] && larger[1]>= smaller[1]) ? 1:0;
 }
 
-console.log( input.reduce( (sum,cur)=> sum + compareRanges(cur[0],cur[1]), 0)); //part 1 solve: 550
+function anyOverlap( range1, range2 )
+{
+    range1 = range1.map( r => parseInt(r));
+    range2 = range2.map( r => parseInt(r));
+
+    let [left,right] = range1[0] <= range2[0] ? [range1,range2] : [range2,range1];
+    return ( right[0] <= left[1]) ? 1 : 0;
+}
+
+console.log( 'Part 1', input.reduce( (sum,cur)=> sum + compareRanges(cur[0],cur[1]), 0)); //part 1 solve: 550
+console.log( 'Part 2', input.reduce( (sum,cur)=> sum + anyOverlap(cur[0],cur[1]), 0)); //part 2 solve: 931
