@@ -58,4 +58,6 @@ for( let i = breakIndex+1; i < input.length; i++)
 
 let output = '';
 stacks.forEach( stack => output += stack[stack.length-1]);
-console.log( output ); //part 1 solve: GFTNRBZPF
+console.log( output ); 
+//part 1 solve: GFTNRBZPF
+//part 2 solve: VRQWPDSGP
