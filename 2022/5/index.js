@@ -40,11 +40,22 @@ function doInstruction( move, from, to )
     }
 }
 
+function doInstruction2( move, from, to )
+{
+    let moving = [];
+    for( let i = 0; i < move; i++)
+    {
+        moving.push( stacks[from-1].pop());
+    }
+    stacks[to-1].push( ...moving.reverse() );
+}
+
 //do instructions
 for( let i = breakIndex+1; i < input.length; i++)
 {
-    doInstruction( ...parseInstruction( input[i] ) );
+    doInstruction2( ...parseInstruction( input[i] ) );
 }
+
 let output = '';
 stacks.forEach( stack => output += stack[stack.length-1]);
 console.log( output ); //part 1 solve: GFTNRBZPF
