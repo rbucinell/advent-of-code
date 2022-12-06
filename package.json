@@ -3,11 +3,15 @@
   "name": "advent-of-code",
   "version": "1.0.0",
   "description": "https://adventofcode.com",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "create": "node util/create.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.2.1",
+    "dotenv": "^16.0.3"
+  }
 }
