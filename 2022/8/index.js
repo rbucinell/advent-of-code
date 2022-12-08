@@ -3,15 +3,15 @@ class Plot{
     constructor(height)
     {
         this.height = height;
-        this.visible = null;
+        this.visible = true;
         this.score = 0;
     }
 }
 
 let [example,input] = ['example','input'].map( i => 
-    read( 2022, 8, i ).map( e => e.split('').map( i => new Plot(parseInt(i)))));
-//console.log( input );
-
+    read( 2022, 8, i )
+    .map( e => e.split('')
+    .map( i => new Plot(parseInt(i)))));
 
 function isVisibleNorth( data, row, col )
 {
@@ -51,27 +51,13 @@ function isVisibleWest( data, row, col )
 }
 function treesVisible( data )
 {
-    for( let row = 0; row < data.length; row++)
-    {        
-        for( let col = 0; col < data[row].length; col++)
-        {
-            if (row === 0 || row === data.length-1 || col === 0 || col === data[row].length-1){
-                data[row][col].visible = true;
-                continue;
-            }
-            data[row][col].visible = isVisible( data, row, col );
-
-        }
-    }
-    let count = 0;
-    for( let row = 0; row < data.length; row++)
-    {        
-        for( let col = 0; col < data[row].length; col++)
-        {
-            count += data[row][col].visible? 1: 0;
-        }
-    }
-    console.log( `Visible Trees: `, data.flat().filter( p => p.visible ).length );
+    //initialize with outsize permimeter
+    let count = data.length*2+ data[0].length*2; 
+    data.forEach((row,r) => row.forEach( (plot,c) => {
+        plot.visible = isVisible( data, r, c );
+        if( plot.visible ) count ++;
+    }));
+    console.log( `Visible Trees = ${data.flat().filter( p => p.visible ).length}`);
 }
 function isVisible( data, row, col )
 {
@@ -92,7 +78,6 @@ function northScore( data, row, col )
     }
     return dist;
 }
-
 function southScore( data, row, col )
 {
     let height = data[row][col].height;
@@ -126,7 +111,6 @@ function westScore( data, row, col )
     }
     return dist;
 }
-
 function sceneicScore( data, row, col )
 {
     if( row === 0 || col === 0 ) return 0;
@@ -136,21 +120,16 @@ function sceneicScore( data, row, col )
         eastScore( data, row, col )];
     return scores.reduce( (acc,cur)=> acc * cur );
 }
-
 function largestScenicScore(data)
 {
-    let latergestScore = 0;
-    for( let row = 0; row < data.length; row++)
-    {        
-        for( let col = 0; col < data[row].length; col++)
-        {
-            data[row][col].score = sceneicScore( data, row, col );
-            if( data[row][col].score > latergestScore)
-            latergestScore = data[row][col].score;
-        }
-    }
-    console.log( `Largest Score = ${latergestScore}`)
+    let largestScore = 0;
+    data.forEach((row,r) => row.forEach( (col,c) => {
+        let score = sceneicScore( data, r, c );
+        if( score > largestScore) largestScore = score;
+    }));
+    console.log( `Largest Score = ${largestScore}`);
 }
+
 //Part 1
 treesVisible(example); //21
 treesVisible(input); //1870
