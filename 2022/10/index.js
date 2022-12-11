@@ -1,100 +1,104 @@
 import {read} from '../../util/input.js'
 let [example,input, short] = ['example','input', 'short'].map( i => read( 2022, 10, i ));
 
-function add( arr, index, value, execTime )
+function sumCycles( instructions, polls)
 {
-    arr[index+execTime] = parseInt(value);
-}
-
-function addx( arr, index, value )
-{
-    add( arr, index, value, 2 );
-}
-
-function noop( arr, index ){
-    add( arr,index, 0, 1 );
-}
-
-function signalStrenth(x)
-{
-    return x* 2;
-}
-
-
-function findSignalStregnth( signals, cycleCount )
-{
-    for( let i = 0; i < cycleCount; i++)
-    {
-
-    }
-
-
-
-
-
-
     let x = 1;
-    let cycles = new Array( cycleCount * 20 + 1 ).fill(0);
-    let addxcount = [];
-    for( let c = 0; c < cycles.length; c++ )
+    let solvedPolls = [];
+    let curPoll = polls.shift();
+    let curCycle = 1;
+    let totalInstructions = instructions.length;
+    for( let i = 0; i < totalInstructions; i++)
     {
-        let startValue = c-1 < 0 ? 1 :cycles[ c-1 ];
-        let newVal = startValue +  cycles[c];
-        let output = `[${c}] s.${startValue}  e${newVal} | `;
-        if( signals.length > 0 )
-        {
-            let signal = signals.shift()
-            let [instruction, v = 0] = signal.split(/\s/);
-            eval(instruction)(cycles,c,v);
-            output += ` ${cycles[c]}, ${newVal}, ${instruction}, ${v}`;
-            
-            if( c % 20 === 0)
+        let during = x;
+        let next = instructions.shift();
+        let [instruction, v=0] = next.split(/\s/);
+        if( curPoll == curCycle || (curCycle % 2 === 1 && curCycle +1 === curPoll))
             {
-                //ev20.push( cycles[c])
+                solvedPolls.push( curPoll * x );
+                curPoll = polls.shift();
             }
-            cycles[c] = newVal;
+        //console.log( curCycle, during);
+        if( instruction === 'noop')
+        {
+            curCycle +=1;
         }
-        console.log( startValue, cycles[c], newVal );// instruction, v );
-        
-        
+        else
+        {
+            curCycle +=2;
+            x += parseInt(v);
+        }
     }
-    //console.log( signals );
-    console.log( cycles );
-    let sum = 0;
-    for( let cycle = 20; cycle <= cycleCount*20; cycle+=20)
-    {
-        console.log( cycle, cycles[cycle/2], cycles[cycle/2]*cycle*20)
-        sum += cycles[cycle/2]
-    }
-    return sum;
+    return solvedPolls.reduce( (acc,cur)=> acc+cur, 0);
 }
+//part 1
+console.log('example',sumCycles([...example], [20,60,100,140,180,220]) );// 13140
+console.log('part 1',sumCycles([...input], [20,60,100,140,180,220]) ); ///14060
 
+//part 2
 
-function findStrength(arr, cycle)
+function draw( pixels )
 {
-    const orginal_cycle = cycle;
-    let x = 1;
-    cycle--;
-    for( let i = 0; i < cycle; i++ )
+    pixels = JSON.parse(JSON.stringify(pixels));
+    //draw crt
+    for( let i = 0; i < 6; i++ )
     {
-        if( i > arr.length) break;
-        let [instruction, v = 0] = arr[i].split(/\s/);
-        //console.log( arr[i],'|', instruction, v);
-        x += parseInt(v);
-        if( instruction === 'addx') cycle--;
+        let row = pixels.splice(0,40);
+        console.log( row.join(''));
     }
-    console.log( x, orginal_cycle, x *orginal_cycle );
-    return x*orginal_cycle;
 }
-let sum = 0;
-sum += findStrength( example, 20 );
-sum += findStrength( example, 60 );
-sum += findStrength( example, 100 );
-sum += findStrength( example, 140 );
-sum += findStrength( example, 180 );
-sum += findStrength( example, 220 );
-console.log( sum );
 
-//console.log( `short: ${findSignalStregnth( short, 1 )}`);
-//console.log( `example: ${findSignalStregnth( example, 6 )} ?== 13140`);
-//console.log( `example: ${findSignalStregnth( input, 6 )} ?== 13140`);
+
+function drawCRT( instructions ){
+    let x = 1;
+    let registerPositions = new Map();
+
+    //set register positions
+    let curCycle = 1;
+    let totalInstructions = instructions.length;
+    for( let i = 0; i < totalInstructions; i++)
+    {
+        let during = x;
+        let next = instructions.shift();
+        let [instruction, v=0] = next.split(/\s/);
+
+        //pixels[x] = '#'
+        registerPositions.set(curCycle, during);
+
+        if( instruction === 'noop')
+        {
+            curCycle +=1;
+        }
+        else
+        {
+            curCycle +=2;
+            x += parseInt(v);
+        }
+    }
+
+    //populate crt
+    let rows = 6;
+    let cols = 40;
+    x = 1;
+    let crt = '';
+    let pixel = 0;
+    for( let r = 0; r < rows; r++)
+    {
+        for( let c = 0; c < cols; c++)
+        {
+            let i = r*cols+c;
+            if( registerPositions.has(i+1) )
+                x = registerPositions.get(i+1);
+            crt += (pixel === x-1 || pixel === x ||pixel  === x+1) ? '#':'.';
+            pixel++;
+            if( pixel === 40 )
+            {
+                pixel = 0;
+                console.log( crt );
+                crt = '';
+            }
+        }
+        
+    }
+}
+drawCRT( input );
