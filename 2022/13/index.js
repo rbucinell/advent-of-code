@@ -89,7 +89,7 @@ function part2( data )
 
     let decoderIndex1 = packets.find( [[2]] ) + 1;
     let decoderIndex2 = packets.find( [[6]] ) + 1;
-    return decoderIndex1 + decoderIndex2;}
+    return decoderIndex1 * decoderIndex2;}
 
 
 
