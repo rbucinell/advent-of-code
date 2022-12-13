@@ -28,17 +28,17 @@ class Monkey {
 
     test( item )
     {
-        return item % this.testCond === 0 ? this.trueId : this.falseId;
+        return item % BigInt(this.testCond) === 0 ? this.trueId : this.falseId;
     }
 
     testFn(params) {
         if( this.opValue === 'old')
             params = this.opValue;
         switch( this.opOperator ){
-            case '+': return params + this.opValue;
-            case '*': return params * this.opValue;
-            case '/': return params / this.opValue;
-            case '-': return params - this.opValue;
+            case '+': return params + BigInt(this.opValue);
+            case '*': return params * BigInt(this.opValue);
+            case '/': return params / BigInt(this.opValue);
+            case '-': return params - BigInt(this.opValue);
             case '^': return params * params;
         }
     }
@@ -50,7 +50,7 @@ function parseMonkies( input )
     for( let i = 0; i < input.length; i+=7)
     {
         let id = input[i].charAt('Monkey '.length);
-        let items = input[i+1].substring(`Starting items: `.length+2).split(' ').map( m => parseInt(m.trim()));
+        let items = input[i+1].substring(`Starting items: `.length+2).split(' ').map( m => BigInt(parseInt(m.trim())));
         let operation = input[i+2].substring(`Operation: new = old `.length+1).trim().split(' ');
         let divisibleBy = parseInt(input[i+3].substring(`Test: divisible by `.length+1).trim())
         let trueMonk =parseInt(input[i+4].charAt(input[i+4].length-1));
@@ -77,8 +77,8 @@ function monkeyBusiness( input, rounds )
             {
                 let item = monkey.items.shift();
                 item = monkey.inspect( item );
-                //item = Math.floor((item % lcm)/3);
-                item%=lcm;
+                item = item /3n;
+                //item%=BigInt(lcm);
                 let newMonkey = monkey.test(item);
                 monkeys[newMonkey].items.push( item );
             }
