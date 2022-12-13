@@ -87,8 +87,8 @@ function part2( data )
     packets.reverse();
     packets.forEach( d => console.log(pp(d)));
 
-    let decoderIndex1 = packets.find( [[2]] ) + 1;
-    let decoderIndex2 = packets.find( [[6]] ) + 1;
+    let decoderIndex1 = packets.indexOf( [[2]] ) + 1;
+    let decoderIndex2 = packets.indexOf( [[6]] ) + 1;
     return decoderIndex1 * decoderIndex2;}
 
 
