@@ -15,24 +15,5 @@ if( !fs.existsSync(`./${year}/${day}`))
     fs.mkdirSync(`./${year}/${day}`);
 fs.writeFileSync(`./${year}/${day}/README.md`, '');
 fs.writeFileSync(`./${year}/${day}/example.txt`, '');
-let inputData = await download(year,day);
-
-fs.writeFileSync(`./${year}/${day}/input.txt`, inputData);
-fs.writeFileSync(`./${year}/${day}/index.js`, `import {read} from '../../util/input.js'
-let [example,input] = ['example','input'].map( i => read( ${year}, ${day}, i ));
-console.log( example );
-
-function part1( data ){
-    
-}
-
-function part2( data ){
-    
-}
-
-console.log( "Example Part1:",part1( example ) );
-console.log( "Example Part1:",part1( input ) );
-
-console.log( "Example Part1:",part2( example ) );
-console.log( "Example Part1:",part2( input ) );
-`);
+fs.writeFileSync(`./${year}/${day}/input.txt`, await download(year,day));
+fs.copyFileSync( './util/template.js', `./${year}/${day}/index.js`);

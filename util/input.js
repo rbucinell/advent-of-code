@@ -1,8 +1,7 @@
 import fs from 'fs';
 import axios from 'axios';
-import { env } from 'process';
+import {env} from 'process';
 import * as dotenv from 'dotenv'
-
 dotenv.config()
 
 /**
@@ -19,6 +18,19 @@ export function read( year, day, file="example" )
 }
 
 /**
+ * Reads the data from the input file into memory as a list of lines
+ * 
+ * @param {string} dir The directory of the file
+ * @param {string} file (input || example) without file extension
+ * @returns an array of lines from the input
+ */
+export function readFromDir( dir, file="example" )
+{
+    let [day,year] = dir.split('/').reverse();
+    return read(year,day,file);
+}
+
+/**
  * Downloads the challenge's input. Must have SESSION set in dotenv.
  * 
  * @param {string} year The year of the challenge
@@ -28,7 +40,7 @@ export function read( year, day, file="example" )
 export async function download(year, day){
     try {
         if( !env.SESSION ) {
-            console.log( "Set session in .env");
+            console.log( "Set SESSION variable in .env");
             return '';
         }
         return (await axios.get( `https://adventofcode.com/${year}/day/${day}/input`, {
