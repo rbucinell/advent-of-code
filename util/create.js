@@ -13,7 +13,7 @@ if( !day ) {
 
 if( !fs.existsSync(`./${year}/${day}`)) 
     fs.mkdirSync(`./${year}/${day}`);
-fs.writeFileSync(`./${year}/${day}/README.md`, '');
+//fs.writeFileSync(`./${year}/${day}/README.md`, '');
 fs.writeFileSync(`./${year}/${day}/example.txt`, '');
 fs.writeFileSync(`./${year}/${day}/input.txt`, await download(year,day));
 fs.copyFileSync( './util/template.js', `./${year}/${day}/index.js`);
