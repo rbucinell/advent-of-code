@@ -1,50 +1,9 @@
 import {read} from '../../util/input.js'
+import Monkey from './monkey.js'
+
 let [example,input] = ['example','input'].map( i => read( 2022, 11, i ));
-//console.log( input );
 
-class Monkey {
-    constructor( id, startingItems=[], opOperator, opValue, testCond, trueId, falseId){
-        this.id = id;
-        this.items = startingItems;
-        this.trueId = trueId;
-        this.falseId = falseId;
-        this.opOperator = opOperator;
-        this.opValue = opValue;
-        this.testCond = testCond;
-        this.inspectCount = 0;
-
-        if(opValue === 'old' )
-        {
-            this.opOperator = '^';
-            this.opValue = 2;
-        }
-    }
-
-    inspect( item )
-    {
-        this.inspectCount++;
-        return this.testFn( item );
-    }
-
-    test( item )
-    {
-        return item % BigInt(this.testCond) === 0 ? this.trueId : this.falseId;
-    }
-
-    testFn(params) {
-        if( this.opValue === 'old')
-            params = this.opValue;
-        switch( this.opOperator ){
-            case '+': return params + BigInt(this.opValue);
-            case '*': return params * BigInt(this.opValue);
-            case '/': return params / BigInt(this.opValue);
-            case '-': return params - BigInt(this.opValue);
-            case '^': return params * params;
-        }
-    }
-}
-
-function parseMonkies( input )
+function parseMonkeys( input )
 {
     let monkeys = [];
     for( let i = 0; i < input.length; i+=7)
@@ -60,6 +19,15 @@ function parseMonkies( input )
     return monkeys;
 }
 
+function reportRound( round, monkeys )
+{
+    console.log( `After round ${round}, the monkeys are holding items with these worry levels:`)
+    monkeys.forEach(monkey => {
+        console.log( `Monkey ${monkey.id}: ${monkey.items.join(', ')}`)
+    });
+    console.log( ' ' );
+}
+
 /**
  * 
  * @param {Array} monkeys 
@@ -67,7 +35,7 @@ function parseMonkies( input )
  */
 function monkeyBusiness( input, rounds )
 {
-    let monkeys = parseMonkies( input );
+    let monkeys = parseMonkeys( input );
     let lcm = monkeys.reduce( (acc,cur) => acc * cur.testCond , 1);
     for( let r = 0; r < rounds; r++ )
     {
@@ -84,10 +52,7 @@ function monkeyBusiness( input, rounds )
             }
         });
 
-        //output monkeys at end of round
-        // monkeys.forEach((monkey,m) => {
-        //     console.log( `Monkey ${monkey.id}: ${monkey.items.join(', ')}`)
-        // });
+        reportRound(r, monkeys);
     }
     monkeys.sort( (a, b) => b.inspectCount - a.inspectCount );
     return monkeys[0].inspectCount * monkeys[1].inspectCount;
@@ -112,5 +77,5 @@ const calculateLCM = (...arr) => {
     return n;
  };
 
-console.log(`part1: ${monkeyBusiness(example, 20)}`);
+console.log(`example: ${monkeyBusiness(example, 20)}`); //Expected result: 10605
 console.log(`part1: ${monkeyBusiness(input, 20)}`);
