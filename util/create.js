@@ -10,7 +10,8 @@ if( !day ) {
     console.log(`Need day paramter`);
     process.exit();
 }
-
+if( !fs.existsSync(`./${year}/`)) 
+    fs.mkdirSync(`./${year}/`);
 if( !fs.existsSync(`./${year}/${day}`)) 
     fs.mkdirSync(`./${year}/${day}`);
 //fs.writeFileSync(`./${year}/${day}/README.md`, '');
