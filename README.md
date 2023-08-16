@@ -7,9 +7,13 @@ Log into advent of code, and copy session token to dotenv file in order for auto
 ```
 SESSION=...
 ```
+Then run
+```
+pnpm install
+```
 
 ### Setup Puzzle
 Run create script to setup default files
 ```
-npm run create <year> <day>
+pnpm run create <year> <day>
 ```
