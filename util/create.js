@@ -14,7 +14,8 @@ if( !fs.existsSync(`./${year}/`))
     fs.mkdirSync(`./${year}/`);
 if( !fs.existsSync(`./${year}/${day}`)) 
     fs.mkdirSync(`./${year}/${day}`);
-//fs.writeFileSync(`./${year}/${day}/README.md`, '');
-fs.writeFileSync(`./${year}/${day}/example.txt`, '');
+if( !fs.existsSync(`./${year}/${day}/example.txt`))
+    fs.writeFileSync(`./${year}/${day}/example.txt`, '');
+if( !fs.existsSync(`./${year}/${day}/index.js`))
+    fs.copyFileSync( './util/template.js', `./${year}/${day}/index.js`);
 fs.writeFileSync(`./${year}/${day}/input.txt`, await download(year,day));
-fs.copyFileSync( './util/template.js', `./${year}/${day}/index.js`);
