@@ -3,62 +3,58 @@ import path from 'path'
 const curDir = path.dirname(new URL(import.meta.url).pathname);
 let [example,input] = ['example','input'].map( f => readFromDir(curDir, f));
 
-const isSymbol = ( s => !'.0123456789'.includes( s ) ); //anything but number and .
 const isNumber = ( c => /^\d+$/.test(c) );
-  
-function numHasNeighborSymbol( r, c, grid ) {
+const symbols =  ['%', '*', '#', '&', '$', '@', '/', '=', '+', '-'];
+const isSymbol = ( s => symbols.includes(s));
 
-    for( let x = r - 1; x <= r+1; x++ ){
-        for( let y = c -1; y <= c+1; y++ ){
-            if( x === 0 && y === 0) continue; // checking self, skip
-            if( x < 0 || y < 0 ) continue; // off the start of the grid
-            if( x> grid.length-1 || y > grid[r].length-1 ) continue; //off end of grid
-            if( isSymbol( grid[x][y]) ) return true;
+function hasSymbolNeighbor( row, col, grid ) {
+    for( let x = -1; x <= 1; x++ ){
+        for( let y = -1; y <= 1; y++ ){
+            if( x===0 && y===0 ) continue;
+            let r = x + row;
+            let c = y + col;
+            if( r < 0 || c < 0 ) continue;
+            if( r >= grid.length || c >= grid[r].length ) continue;
+            if( isSymbol(grid[r][c] ) )
+                return true;
         }
     }
     return false;
 }
 
-function part1( data ){
+function splitMulti(str, tokens){
+    let tempChar = tokens[0];
+    for(let i = 1; i < tokens.length; i++){
+        str = str.split(tokens[i]).join(tempChar);
+    }
+    str = str.split(tempChar);
+    return str;
+}
 
+function part1( data ){
     let numbers = [];
     for( let r = 0; r < data.length; r++) {
         let row = data[r];
 
-        let trackingNumber = false;
-        let startNumberIndex = 0;
-        let endNumberIndex = 0;
-        let numberIsGood = false;
-
-        for( let c = 0; c < row.length; c++ ){
-            const char = row[c];
-            const charIsNumber = isNumber( char );
-            
-            if( trackingNumber ){
-                endNumberIndex = c;
-                if( !charIsNumber || c+1 === row.length ){
-                    let num = row.substring(startNumberIndex, endNumberIndex);
-                    //console.log( num );
-
-                    numberIsGood = false;
-                    for( let i = startNumberIndex; i < endNumberIndex; i++ ){
-                        if( numHasNeighborSymbol(r,i,data) ){
-                            numberIsGood = true;
-                        }
-                    }
-                    //console.log( num, numberIsGood )
-                    if( numberIsGood)
-                        numbers.push( parseInt(num) )
-                    trackingNumber = false;
+        let splitRow = row
+            .split('.') //remove all '.'
+            .map( e => splitMulti( e, symbols )) //further split on all symbols if two numbers conjoined by symbol
+            .flat() // bring all array of arrays down to 1 level
+            .filter( e => e !== ''); //filter any empty strings that removed symbols caused.
+        let startIndex = 0;
+        splitRow.forEach(number => {
+            //foreach number get start and end index
+            let index = row.indexOf( number, startIndex );
+            let endIndex = index + number.length;
+            for( let i = index; i <= endIndex; i++ ){
+                let curChar = row[i];
+                if( hasSymbolNeighbor(r,i,data) ){
+                    numbers.push( number );
+                    break;
                 }
-            }
-            else {
-                if( charIsNumber ){
-                    startNumberIndex = c;
-                    trackingNumber = true;
-                }
-            }
-        }
+            }                
+            startIndex = endIndex;
+        });
     }
     return numbers.reduce( (acc,cur) => acc + parseInt(cur), 0);
 }

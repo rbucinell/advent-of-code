@@ -38,6 +38,7 @@ export function readFromDir( dir, file="example" )
  * @returns The response's data, or '' if failure
  */
 export async function download(year, day){
+    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0
     try {
         if( !env.SESSION ) {
             console.log( "Set SESSION variable in .env");
