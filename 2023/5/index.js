@@ -8,15 +8,25 @@ class AlmanacMap{
         this.name = name;
         this.conversions = conversions.map(c => {
             let [ destRangeStart, srcRangeStart, rangeLen] = c.split(' ').map( s => parseInt( s ));
-            return {destRangeStart, srcRangeStart, rangeLen};
+            return { 
+                src: {
+                    start: srcRangeStart,
+                    stop: srcRangeStart + rangeLen-1,
+                },
+                dest: {
+                    start: destRangeStart,
+                    stop: destRangeStart+ rangeLen-1
+                },
+                shift: dest.start - src.start
+            }
         });
+        this.conversions.sort( (a,b) => a.src.start - b.src.start);
     }
         
     convert( input ) {
-        for( let conversion of this.conversions ){
-            if( input >= conversion.srcRangeStart && input <= conversion.srcRangeStart + conversion.rangeLen ){
-                let diff = input - conversion.srcRangeStart;
-                return conversion.destRangeStart + diff;
+        for( let c of this.conversions ){
+            if( input >= c.src.start && input <= c.src.stop ){
+                return input + c.shift;
             }
         }
         return input;
@@ -26,9 +36,9 @@ class AlmanacMap{
 class Almanac {
     constructor( lines ) {
         this.maps = [];
-        
         let name = '';
         let conversions = [];
+        
         for( let i = 0; i < lines.length; i++ ){
             let line = lines[i];
             if( line === '' ){
@@ -45,16 +55,13 @@ class Almanac {
             }
         }
         this.maps.push(new AlmanacMap( name, conversions ));
-
     }
 
     lowestLocation( seeds ){
         let lowestLocation = Number.MAX_VALUE;
         seeds.forEach( seed => {
-            let value = seed;
-            let out = this.getLocation( value );
-            lowestLocation = Math.min( lowestLocation, out );
-        })
+            lowestLocation = Math.min( lowestLocation, this.getLocation( seed ) );
+        });
         return lowestLocation;
     }
 
@@ -98,3 +105,8 @@ console.log( "Input   Part1:",part1( input ) );
 
 console.log( "Example Part2:",part2( example ) );
 console.log( "Input   Part2:",part2( input ) );
+
+//Example Part1: 35
+//Input   Part1: 261668924
+//Example Part2: 46
+//Input   Part2: 24261545
