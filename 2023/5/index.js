@@ -3,22 +3,6 @@ import path from 'path'
 const curDir = path.dirname(new URL(import.meta.url).pathname);
 let [example,input] = ['example','input'].map( f => readFromDir(curDir, f));
 
-class AlmanacConversion {
-    constructor( destRangeStart, srcRangeStart, rangeLen ){
-        this.destRangeStart = destRangeStart;
-        this.srcRangeStart = srcRangeStart;
-        this.rangeLen = rangeLen;
-        this.conversionMap = {};
-        for( let i = 0; i < this.rangeLen; i++ ){
-            this.conversionMap[ this.srcRangeStart + i ]  = this.destRangeStart + i;
-        }
-    }
-
-    convert( input ){
-        return input in this.conversionMap ? this.conversionMap[input] : input;
-    }
-}
-
 class AlmanacMap{
     constructor( name, conversions ){
         this.name = name;
@@ -41,8 +25,6 @@ class AlmanacMap{
 
 class Almanac {
     constructor( lines ) {
-        this.seeds = lines.shift().replace('seeds: ', '').split(' ').map( s => parseInt(s));
-        lines.shift();//burn space
         this.maps = [];
         
         let name = '';
@@ -66,26 +48,51 @@ class Almanac {
 
     }
 
+    lowestLocation( seeds ){
+        let lowestLocation = Number.MAX_VALUE;
+        seeds.forEach( seed => {
+            let value = seed;
+            let out = this.getLocation( value );
+            lowestLocation = Math.min( lowestLocation, out );
+        })
+        return lowestLocation;
+    }
 
+    getLocation( seed ){
+        let value = seed;
+        if( value in this.memo ) return this.memo[value];
+        this.maps.forEach( map => value = map.convert( value ) );
+        this.memo[seed] = value;
+        return value;
+    }
 }
 
 
 function part1( data ){
-    let almanac = new Almanac(data);
-    let lowestLocation = Number.MAX_VALUE;
-    almanac.seeds.forEach( seed => {
-        let value = seed;
-        almanac.maps.forEach( map => {
-            let out = map.convert( value );
-            value = out;
-        });
-        lowestLocation = Math.min( lowestLocation, value );
-    })
-    return lowestLocation;
+    let d = JSON.parse( JSON.stringify(data));
+    let seeds = d.shift().replace('seeds: ', '').split(' ').map( s => parseInt(s));
+    d.shift();//burn space
+    let almanac = new Almanac(d);
+    return almanac.lowestLocation(seeds);
 }
 
 function part2( data ){
-    
+    let d = JSON.parse( JSON.stringify(data));
+    let seedPairs = d.shift().replace('seeds: ', '').split(' ').map( s => parseInt(s));
+    d.shift();//burn space
+    let almanac = new Almanac(d);
+    let lowest = Number.MAX_VALUE;
+    for( let i = 0; i < seedPairs.length; i+=2){
+
+        let start = seedPairs[i];
+        let count = seedPairs[i+1];
+        for( let s = 0; s < count; s++ ){
+            let seed = start + s;
+            let location = almanac.getLocation( seed );
+            lowest = Math.min( lowest, location);
+        }
+    }
+    return lowest;
 }
 
 console.log( "Example Part1:",part1( example ) );
