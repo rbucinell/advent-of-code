@@ -2,6 +2,7 @@ import fs from 'fs';
 import axios from 'axios';
 import {env} from 'process';
 import * as dotenv from 'dotenv'
+import path from 'path'
 dotenv.config()
 
 /**
@@ -57,4 +58,9 @@ export async function download(year, day){
         console.log( `Error: ${ex}`)
         return '';
     }
+}
+
+export function build( directoryPath, inputs = ['example', 'input'] ){
+    const curDir = path.dirname(new URL(directoryPath).pathname);
+    return Object.fromEntries(inputs.map( f => [f, readFromDir(curDir, f)]));
 }

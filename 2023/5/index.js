@@ -1,7 +1,6 @@
-import {readFromDir} from '../../util/input.js'
-import path from 'path'
-const curDir = path.dirname(new URL(import.meta.url).pathname);
-let [example,input] = ['example','input'].map( f => readFromDir(curDir, f));
+import { build } from '../../util/input.js';
+import { execute } from '../../util/process.js';
+let inputs = build(import.meta.url);
 
 class AlmanacMap{
     constructor( name, conversions ){
@@ -17,7 +16,7 @@ class AlmanacMap{
                     start: destRangeStart,
                     stop: destRangeStart+ rangeLen-1
                 },
-                shift: dest.start - src.start
+                shift: destRangeStart - srcRangeStart
             }
         });
         this.conversions.sort( (a,b) => a.src.start - b.src.start);
@@ -38,7 +37,7 @@ class Almanac {
         this.maps = [];
         let name = '';
         let conversions = [];
-        
+
         for( let i = 0; i < lines.length; i++ ){
             let line = lines[i];
             if( line === '' ){
@@ -100,12 +99,8 @@ function part2( data ){
     return lowest;
 }
 
-console.log( "Example Part1:",part1( example ) );
-console.log( "Input   Part1:",part1( input ) );
 
-console.log( "Example Part2:",part2( example ) );
-console.log( "Input   Part2:",part2( input ) );
-
+execute([part1, part2], inputs);
 //Example Part1: 35
 //Input   Part1: 261668924
 //Example Part2: 46
