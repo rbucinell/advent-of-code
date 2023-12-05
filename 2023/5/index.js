@@ -60,9 +60,7 @@ class Almanac {
 
     getLocation( seed ){
         let value = seed;
-        if( value in this.memo ) return this.memo[value];
         this.maps.forEach( map => value = map.convert( value ) );
-        this.memo[seed] = value;
         return value;
     }
 }
