@@ -3,7 +3,7 @@ import { execute } from '../../util/process.js';
 let inputs = build(import.meta.url);
 
 const isNumber = ( c => /^\d+$/.test(c) );
-const symbols =  ['%', '*', '#', '&', '$', '@', '/', '=', '+', '-'];
+const symbols =  ['%', '*', '#', '&', '$', '@', '/', '=', '+', '-'];
 const isSymbol = ( s => symbols.includes(s));
 
 function hasAdjecentSymbol( data, r, c )
