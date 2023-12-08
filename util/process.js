@@ -10,6 +10,9 @@ export function measured( input, fn, data ){
     console.log( `[${(end - start).toFixed(2)}ms]\t${capitalize(input)}\t${ capitalize(fn.name)}: ${response} ` );
 }
 
-export function execute( functions, inputs ){
-    functions.forEach( fn => Object.entries(inputs).forEach(e => measured(e[0],fn,e[1])));
+export function execute( functions, inputs, debug = false ){
+    functions.forEach( fn => Object.entries(inputs).forEach(e => {
+        measured(e[0],fn,e[1]);
+        if( debug ) debugger;
+    }));
 }
