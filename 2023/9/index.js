@@ -25,6 +25,16 @@ class Sequence {
         }
         return prev;
     }
+
+    beginingExtrapolate(){
+        let prev = 0;
+        for( let h = this.history.length - 2; h >= 0; h--){
+            let curHist = this.history[h];
+            let last = curHist[0];
+            prev = last - prev;   
+        }
+        return prev;
+    }
 }
 
 
@@ -34,7 +44,12 @@ function part1( data ){
 }
 
 function part2( data ){
-    return 0;
+    let sequences = data.map( d => new Sequence(d) );
+    return sequences.reduce( (acc,cur) => acc + cur.beginingExtrapolate(), 0 );
 }
 
 execute([part1, part2], inputs);
+//[0.11ms]	Example	Part1: 114 
+//[2.27ms]	Input	Part1: 2005352194 
+//[0.11ms]	Example	Part2: 2 
+//[2.64ms]	Input	Part2: 1077 
