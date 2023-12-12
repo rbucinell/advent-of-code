@@ -77,20 +77,6 @@ class TileGrid extends Grid{
 function part1( data ){
     let grid = new TileGrid(data.length, data[0].length, data.map( row => row.split('')));
     let start = grid.find('S');
-    // let queue = [grid.getNeighbors(start)[0]];
-    // let visited = [start];
-    // let count = 1;
-    // while( queue.length > 0 ){
-    //     let cur = queue.shift();
-    //     visited.push( cur );
-    //     count++;
-    //     let neighbors = grid.getNeighbors(cur);
-    //     neighbors = neighbors.filter( n => !visited.includes( n ));
-    //     if( neighbors.length > 0)
-    //         queue.push( neighbors?.shift() );
-    // }
-    // return count /2 ;
-
     //bfs approach
     let visited = [];
     start.dist = 0;
@@ -117,8 +103,40 @@ function part1( data ){
     //grid.display();
     return dist;//Math.max(...visited.map( v => v.dist));
 }
-//6735 too low
+
+function floodfill( grid ){
+    let queue = [ grid.getNode(0,0), grid.getNode(0,grid.cols-1), grid.getNode(grid.rows-1,0), grid.getNode(grid.rows-1, grid.cols-1)]
+    while( queue.length > 0){
+        let cur = queue.shift();
+        if( !('dist' in cur )){
+            cur.dist = 'O';
+        }
+        for( let i = -1; i <= 1; i++){
+            for( let j = -1; j <= 1; j++){
+                if( i >= 0 && i < grid.rows-1 && j>= 0 && j < grid.cols-1){
+                    let newLoc = cur.loc.to(i,j);
+                    let n = grid.getNode(newLoc.r,newLoc.c);
+                    if( n && n.value === '.' && n.dist != 'O'){
+                        queue.push(n);
+                    }
+                }
+            }
+        }
+    }
+
+    let count = 0;
+    for( let r of grid.nodes){
+        for( let c of r){
+            if( c.dist === 'O') count++;
+        }
+    }
+    return count;
+}
+
+
 function part2( data ){
+    let grid = new TileGrid(data.length, data[0].length, data.map( row => row.split('')));
+    let start = grid.find('S');
     let visited = [];
     start.dist = 0;
     let queue = [start];
@@ -140,6 +158,8 @@ function part2( data ){
             }
         }
     }
+
+    return floodfill( grid )
 }
 
 execute([part1, part2], inputs);
