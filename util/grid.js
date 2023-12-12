@@ -5,6 +5,16 @@ export class Loc {
     }
 
     /**
+     * Returns a new Loc based on the current and shifting values
+     * @param {int} shiftR the relative amount of rows to shift
+     * @param {int} shiftC the relative amount of cols to shift
+     * @returns {Loc} a new Loc shifted from the given values
+     */
+    to( shiftR, shiftC ){
+        return new Loc(this.r+shiftR, this.c+shiftC);
+    }
+
+    /**
      * @param {Loc} other 
      */
     equals( other ){ return this.r === other.r && this.c === other.c; }
@@ -56,16 +66,11 @@ export class Grid {
         return grid;
     }
 
-    /** 
-     * @param {Loc} loc 
-     */
-    getNode( r, c, loc ) {
+    
+    getNode( r, c ) {
         return this.nodes[ r ][ c ];
     }
 
-    /** 
-     * @param {Loc} loc 
-     */
     setNode(r, c, val){
         this.nodes[r][c].value = val;
     }
@@ -92,7 +97,7 @@ export class Grid {
             neighbors.push( new Loc( r-1 , c+1 ));
             neighbors.push( new Loc( r-1 , c-1 ));
         }
-        for( let i = neighbors.length; i >= 0; i--){
+        for( let i = neighbors.length-1; i >= 0; i--){
             let neighbor = neighbors[i];
             if( neighbor.r < 0 || neighbor.c < 0 || neighbor.r >= this.rows || neighbor.c >= this.cols ) neighbors.splice(i,1);
         }
