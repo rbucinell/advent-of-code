@@ -4,7 +4,7 @@ import {Grid, Node, Loc} from '../../util/grid.js';
 let inputs = build(import.meta.url, ['simple', 'example','6820-337','3022-0','7012-_','input']);
 
 class TileGrid extends Grid{
-    getNeighbors(node){
+    getPipeNeighbors(node){
         //call to get generic valid neighbors
         let { loc, value } = node;
         let neighbors = super.getNeighbors(loc.r,loc.c);
@@ -19,7 +19,7 @@ class TileGrid extends Grid{
             case 'S': 
                 restrictions = neighbors.filter( neighbor => {
                     let node = this.getNode(neighbor.r, neighbor.c);
-                    let neighborOfNeighbors = this.getNeighbors(node);
+                    let neighborOfNeighbors = this.getPipeNeighbors(node);
                     return neighborOfNeighbors.some( non => non.value === 'S');
                 });
                 break;
@@ -73,7 +73,6 @@ class TileGrid extends Grid{
     }
 }
 
-
 function part1( data ){
     let grid = new TileGrid(data.length, data[0].length, data.map( row => row.split('')));
     let start = grid.find('S');
@@ -87,7 +86,7 @@ function part1( data ){
         let cur = queue.shift();
         //grid.displayWindow(cur.loc.r, cur.loc.c);
         visited.push( cur );
-        let neighbors = grid.getNeighbors(cur);
+        let neighbors = grid.getPipeNeighbors(cur);
         for( let neighbor of neighbors ) {
             if( !('dist' in neighbor)) {
                 neighbor.dist = cur.dist + 1;
@@ -104,52 +103,32 @@ function part1( data ){
     return dist;//Math.max(...visited.map( v => v.dist));
 }
 
-function floodfill( grid ){
-    let queue = [ grid.getNode(0,0), grid.getNode(0,grid.cols-1), grid.getNode(grid.rows-1,0), grid.getNode(grid.rows-1, grid.cols-1)]
-    while( queue.length > 0){
-        let cur = queue.shift();
-        if( !('dist' in cur )){
-            cur.dist = 'O';
-        }
-        for( let i = -1; i <= 1; i++){
-            for( let j = -1; j <= 1; j++){
-                if( i >= 0 && i < grid.rows-1 && j>= 0 && j < grid.cols-1){
-                    let newLoc = cur.loc.to(i,j);
-                    let n = grid.getNode(newLoc.r,newLoc.c);
-                    if( n && n.value === '.' && n.dist != 'O'){
-                        queue.push(n);
-                    }
-                }
-            }
-        }
-    }
-
-    let count = 0;
-    for( let r of grid.nodes){
-        for( let c of r){
-            if( c.dist === 'O') count++;
-        }
-    }
-    return count;
-}
-
-
 function part2( data ){
+
+    //create a buffer empty space:
+    const newR = '.'.repeat(data[0].length);
+    data.unshift(newR);
+    data.push(newR);
+    data = data.map( row => `.${row}.`);
     let grid = new TileGrid(data.length, data[0].length, data.map( row => row.split('')));
+    
+    ////////////////PART 1 Modifies ///////////////
     let start = grid.find('S');
+    //bfs approach
     let visited = [];
     start.dist = 0;
+    start.isFilled = true;
     let queue = [start];
     let dist = start.dist;
     while( queue.length > 0 )
     {
         let cur = queue.shift();
-        //grid.displayWindow(cur.loc.r, cur.loc.c);
         visited.push( cur );
-        let neighbors = grid.getNeighbors(cur);
+        let neighbors = grid.getPipeNeighbors(cur);
         for( let neighbor of neighbors ) {
             if( !('dist' in neighbor)) {
                 neighbor.dist = cur.dist + 1;
+                neighbor.isFilled = true;
                 dist = Math.max( dist, neighbor.dist );
             }
             if( !visited.includes( neighbor ) )
@@ -158,8 +137,25 @@ function part2( data ){
             }
         }
     }
+    ////////////////
 
-    return floodfill( grid )
+    //860 too high
+    ////Part2 floodfill
+    queue = [grid.getNode(0,0)];
+    while( queue.length > 0 )
+    {
+        let cur = queue.shift();
+        cur.dist = 'O';
+        cur.isFilled = true;
+        let neighbors = grid.getNeighbors(cur.loc.r,cur.loc.c).map( loc => grid.getNode(loc.r,loc.c));
+        neighbors = neighbors.filter( n => !('dist' in n));
+        queue.unshift(...neighbors);
+    }
+    let nonFilled = grid.nodes.flat().reduce( (acc,cur) => acc + ( cur.isFilled ? 0 : 1), 0)
+    console.log( nonFilled );
+    return grid.nodes.reduce( (acc,row) => acc + row.reduce( (sub,cur) => sub + (cur.hasOwnProperty('dist')?0:1),0),0)
+
 }
 
 execute([part1, part2], inputs);
+//[65.50ms]	Part1	Input: 6738 

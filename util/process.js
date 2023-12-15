@@ -7,7 +7,7 @@ export function measured( input, fn, data, debug = false ){
     let start = performance.now();
     let response = fn( data );
     let end = performance.now();
-    console.log( `[${(end - start).toFixed(2)}ms]\t${capitalize(input)}\t${ capitalize(fn.name)}: ${response} ` );
+    console.log( `[${(end - start).toFixed(2)}ms]\t${ capitalize(fn.name)}\t${capitalize(input)}: ${response} ` );
     if( debug ) debugger;
 }
 
