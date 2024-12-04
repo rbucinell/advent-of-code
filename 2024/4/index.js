@@ -2,7 +2,7 @@ import { build } from '../../util/input.js';
 import { execute } from '../../util/process.js';
 let inputs = build(import.meta.url);
 
-function findXMASat( data, x, y ){
+function findXMAS( data, x, y ){
 
     //console.log( "(x,y): ",x, y );
     let findCount = 0;
@@ -49,13 +49,20 @@ function findXMASat( data, x, y ){
     return findCount;
 }
 
+function findCrossMAS( data, x, y ){
+    if( x - 1 < 0 || y - 1 < 0 || x + 1 >= data.length || y + 1 >= data[x].length ) return false;
+    const backslashWord     = `${data[x-1][y-1]}${data[x][y]}${data[x+1][y+1]}`;
+    const forwardslashWord  = `${data[x+1][y-1]}${data[x][y]}${data[x-1][y+1]}`;
+    return (backslashWord === "SAM" || backslashWord === "MAS") && (forwardslashWord == "SAM" || forwardslashWord == "MAS");
+}
+
 
 function part1( data ){
     let sum = 0;
     for( let i = 0; i < data.length; i++ ){
         for( let j = 0; j < data[i].length; j++ ){
             if( data[i][j] === 'X'){
-                sum += findXMASat(data, i, j );
+                sum += findXMAS(data, i, j );
             }
         }
     }
@@ -63,7 +70,15 @@ function part1( data ){
 }
 
 function part2( data ){
-    return 0;
+    let sum = 0;
+    for( let i = 0; i < data.length; i++ ){
+        for( let j = 0; j < data[i].length; j++ ){
+            if( data[i][j] === 'A'){
+                sum += findCrossMAS(data, i, j )? 1 : 0;
+            }
+        }
+    }
+    return sum;
 }
 
 execute([part1, part2], inputs);
