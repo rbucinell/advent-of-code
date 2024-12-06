@@ -1,3 +1,41 @@
+export const Orientation = {
+    North: 'N',
+    NorthEast: 'NE',
+    East: 'E',
+    SouthEast: 'SE',
+    South: 'S',
+    SouthWest: 'SW',
+    West: 'W',  
+    NorthWest: 'NW',
+
+    isValid(value) {
+        return this.list().includes(value);
+    },
+
+    list( includeDiag = false ){
+        let list = Object.values(this).filter(value => typeof value === 'string');
+        if( !includeDiag ) {
+            list = list.filter( _ => _.length === 1 )
+        }
+        return list;
+    },
+
+    turnRight( currentOrientation, includeDiag = false ){
+        const directions =this.list(includeDiag);
+        let index = directions.indexOf( currentOrientation );
+        index = (index+1 >= directions.length) ? 0 : index +1;
+        return directions[index];
+    },
+
+    turnLeft( currentOrientation, includeDiag = false ){
+        const directions =this.list(includeDiag);
+        let index = directions.indexOf( currentOrientation );
+        index = (index-1 < 0) ? directions.length-1 : index - 1;
+        return directions[index];
+    },
+};
+Object.freeze(Orientation);
+
 export class Loc {
     constructor( r, c ){
         this.r = r;
@@ -68,6 +106,8 @@ export class Grid {
 
     
     getNode( r, c ) {
+        if( r < 0 || c < 0 || r >= this.nodes.length || c >= this.nodes[r].length) 
+            return undefined;
         return this.nodes[ r ][ c ];
     }
 
@@ -83,6 +123,47 @@ export class Grid {
             }
         }
         return null;
+    }
+
+    /**
+     * Given a location, returns the neighbor in the given direction.
+     * @param {number} r The row of the source location
+     * @param {number} c The column of the source location
+     * @param {Orientation} direction The direction of the neighbor to return
+     * @return {Node} The neighbor node in the given direction, or null if no neighbor exists
+     */
+    getNeighbor( r, c , direction) {
+        let neighbor = undefined;
+        switch( direction ){
+            case Orientation.North:
+                neighbor = this.getNode(r-1, c);
+            break;
+            case Orientation.NorthEast:
+                neighbor = this.getNode(r-1, c+1);
+            break;
+            case Orientation.East:
+                neighbor = this.getNode(r, c+1);
+            break;
+            case Orientation.SouthEast:
+                neighbor = this.getNode(r+1, c+1);
+            break;
+            case Orientation.South:
+                neighbor = this.getNode(r+1, c);
+            break;
+            case Orientation.SouthWest:
+                neighbor = this.getNode(r+1, c-1);
+            break;
+            case Orientation.West:
+                neighbor = this.getNode(r, c-1);
+            break;
+            case Orientation.NorthWest:
+                neighbor = this.getNode(r-1, c-1);
+            break;
+            default:
+                neighbor = undefined;
+                break;
+        }
+        return neighbor;
     }
 
     getNeighbors( r, c, includeDiag = false) {
@@ -102,5 +183,13 @@ export class Grid {
             if( neighbor.r < 0 || neighbor.c < 0 || neighbor.r >= this.rows || neighbor.c >= this.cols ) neighbors.splice(i,1);
         }
         return neighbors;
+    }
+
+    display(){
+        let output = '';
+        for( const row of this.nodes){
+            output += `${row.map( _ => _.value).join('')}\n`;
+        }
+        return output;
     }
 }
