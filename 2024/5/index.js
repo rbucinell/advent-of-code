@@ -25,8 +25,7 @@ function parsePages( data ){
     return { rules, updates };
 }
 
-function isUpdateCorrect( rules, updates) {
-
+function isUpdatesCorrect( rules, updates) {
     for( let i = 0; i < updates.length; i++ ) {
         const update = updates[i];
         if( !(update in rules) ) continue;
@@ -40,19 +39,43 @@ function isUpdateCorrect( rules, updates) {
             }
         }
     }
-
-
     return true;
 }
 
+function getMinimumIndex( rule,  arr ) {
+    let minIndex = Math.min(...
+        rule.map( r => arr.indexOf( r ) )
+            .filter( r => r !== -1));
+    return minIndex;
+}
+
+function fixUpdatesByRules( rules, updates ) {
+    do {
+        for( let update of updates ){
+            let index = updates.indexOf( update );
+            let minIndex = getMinimumIndex(rules[update], updates);
+            if( index != minIndex ) {
+                updates.splice(minIndex,0,...updates.splice(index,1));
+            }
+        }
+    }while( !isUpdatesCorrect(rules, updates));
+    return updates;
+}
+
 function part1( data ){
-    const { rules, updates } = parsePages( data);
-    const correctUpdates = updates.filter( update => isUpdateCorrect( rules, update ));
+    const { rules, updates } = parsePages( data );
+    const correctUpdates = updates.filter( update => isUpdatesCorrect( rules, update ));
     return correctUpdates.reduce( (acc,cur) => acc + cur[Math.floor(cur.length/2)], 0);
 }
 
 function part2( data ){
-    return 0;
+    const { rules, updates } = parsePages( data);
+    const inCorrectUpdates = updates.filter( update => !isUpdatesCorrect( rules, update ));
+    const fixedRules = inCorrectUpdates.map( _ => fixUpdatesByRules( rules, _ ));    
+    return inCorrectUpdates.reduce( (acc,cur) => acc + cur[Math.floor(cur.length/2)], 0);
 }
-
 execute([part1, part2], inputs);
+//[0.19ms]	Part1	Example: 143 
+//[1.14ms]	Part1	Input: 5166 
+//[0.13ms]	Part2	Example: 123 
+//[4.53ms]	Part2	Input: 4679 
