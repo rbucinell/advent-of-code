@@ -9,10 +9,13 @@ function inputToRanges( data:Array<string> ){
 }
 
 function getAllSubstrings(str:string):string[] {
-    const substrings = [];
+    const substrings:string[] = [];
     for (let i = 0; i < str.length; i++) {
         for (let j = i + 1; j <= str.length; j++) {
-            substrings.push(str.slice(i, j));
+            let newSub = str.slice(i, j);
+            if( !substrings.includes(newSub)){
+                substrings.push(newSub);
+            }
         }
     }
     return substrings.filter( _ => !_.startsWith('0'));
@@ -22,24 +25,14 @@ function countInvalidInRange( range:string[], invalidator:Function ) {
     const low = parseInt( range[0] );
     const high = parseInt( range[1] );
 
-    const memo:Record<string,any> = {};
-
     let invalid = [];
     for( let i = low; i <= high; i++){
         let str = i.toString();
-        if( str in memo ){
-            invalid = memo[str];
-        }else {
-            if( str.startsWith("0") ){
-                continue;
-            }
-            let subs = [...new Set(getAllSubstrings(str))];
-            for(let s of subs){
-                if( invalidator(s,str)){
-                    memo[str] = true;
-                    invalid.push( str );
-                    break;
-                }
+        let subs = getAllSubstrings(str);
+        for(let s of subs){
+            if( invalidator(s,str)){
+                invalid.push( str );
+                break;
             }
         }
     }
@@ -74,7 +67,14 @@ function part2( data:string[] ){
 }
 
 execute([part1, part2], inputs);
+// Solved
 // [0.68ms]	    Part1	Example: 1227775554 
 // [4777.70ms]	Part1	Input: 26255179562 
 // [1.43ms]	    Part2	Example: 4174379265 
 // [5461.61ms]	Part2	Input: 31680313976 
+
+// First round improvements
+// [0.49ms]	    Part1	Example: 1227775554 
+// [2191.92ms]	Part1	Input: 26255179562 
+// [0.50ms]	    Part2	Example: 4174379265 
+// [3012.44ms]	Part2	Input: 31680313976 
